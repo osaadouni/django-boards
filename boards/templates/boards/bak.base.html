@@ -1,0 +1,30 @@
+{# Load the tag library #}
+{% load bootstrap4 %}
+
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <title>Boards</title>
+    {# Load CSS and JavaScript #}
+    {% bootstrap_css  %}
+  </head>
+  <body>
+ 
+   <div class="page-header">
+     <h1><a href="/">Boards App </a></h1>
+   </div>
+   <div class="content container">
+     <div class="row">
+        <div class="col-md-10">
+            {% block content %}
+            {% endblock %}
+        </div>
+      </div>
+    </div>
+
+    
+    {# Load CSS and JavaScript #}
+    {% bootstrap_javascript jquery='full' %}
+  </body>
+</html>     

@@ -1,0 +1,69 @@
+from django.contrib.auth.models import User 
+from django.shortcuts import render, redirect, get_object_or_404
+from django.http import HttpResponse
+
+from .forms import NewTopicForm
+from .models import Board, Topic, Post
+
+# Create your views here.
+
+def home(request):
+    boards = Board.objects.all()
+    return render(request, 'boards/home.html', {'boards': boards})
+
+
+def board_topics(request, pk):
+    board = get_object_or_404(Board, pk=pk)
+    return render(request, 'boards/topics.html', {'board': board})
+
+def new_topic(request, pk):
+    """
+    Create a new topic for the board with primary key {pk}
+    """
+    #print("new_topic({})".format(pk))
+    board = get_object_or_404(Board, pk=pk)
+    user = User.objects.first() # TODO: get the currently logged in user 
+
+    if request.method == 'POST':
+        form = NewTopicForm(request.POST)
+        if form.is_valid():
+            topic = form.save(commit=False)
+            topic.board = board
+            topic.starter = user 
+            topic.save()
+ 
+            post = Post.objects.create(
+                message=form.cleaned_data.get('message'),
+                topic=topic, 
+                created_by=user
+            )
+
+            return redirect('board_topics', pk=board.pk) 
+    else:
+        form = NewTopicForm()
+    
+    return render(request, 'boards/new_topic.html', {'board': board, 'form': form }) 
+
+
+
+
+
+
+# test funcs - url patterns 
+def question(request, pk):
+    return HttpResponse('Submitted question with id: #{0}'.format(pk))
+
+def post(request, slug):
+    return HttpResponse('Post slug: #{0}'.format(slug))
+
+def blog_post(request, slug, pk):
+    return HttpResponse('Blog Post slug: #{0}-{1}'.format(slug, pk))
+
+def user_profile(request, username):
+    return HttpResponse(f'User profile of {username}')
+
+def year_archive(request, year):
+    return HttpResponse(f'Year archive {year}')
+
+def month_archive(request, year, month):
+    return HttpResponse('Year/month archive: {y}/{m}'.format(y=year, m=month))
